@@ -1,25 +1,47 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { FuelMap } from './components/FuelMap';
 import { LiveUpdate } from './components/LiveUpdate';
+import { TelerKhobor } from './components/TelerKhobor';
 import { pumpsData, Division, Pump } from './data/pumps';
-import { MapPin, Fuel, AlertCircle, Search, Filter, Info, ChevronRight, Menu, X, ExternalLink } from 'lucide-react';
+import { MapPin, Fuel, AlertCircle, Search, Filter, Info, ChevronRight, Menu, X, ExternalLink, Image as ImageIcon } from 'lucide-react';
 
 const divisions: Division[] = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'live'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'about' | 'live' | 'teler-khobor'>('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedDivision, setSelectedDivision] = useState<Division | 'সব'>('সব');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPump, setSelectedPump] = useState<Pump | null>(null);
-  
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const path = window.location.pathname;
+      if (path === '/teler-khobor') setCurrentPage('teler-khobor');
+      else if (path === '/about') setCurrentPage('about');
+      else if (path === '/live') setCurrentPage('live');
+      else setCurrentPage('home');
+    };
+
+    handleLocationChange(); // Initial check on load
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  const handleNavigation = (page: 'home' | 'about' | 'live' | 'teler-khobor', path: string) => {
+    setCurrentPage(page);
+    window.history.pushState({}, '', path);
+    setIsMobileMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
+
   const mapSectionRef = useRef<HTMLElement>(null);
 
   const filteredPumps = useMemo(() => {
     return pumpsData.filter((pump) => {
       const matchDivision = selectedDivision === 'সব' || pump.division === selectedDivision;
-      const matchSearch = pump.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          pump.district.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchSearch = pump.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pump.district.toLowerCase().includes(searchQuery.toLowerCase());
       return matchDivision && matchSearch;
     });
   }, [selectedDivision, searchQuery]);
@@ -48,20 +70,20 @@ function App() {
                 তেল না পাইলে জীবন শেষ
               </div>
               <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                যে ভাই তেল নিয়ে <span className="text-blue-600">তারাতারি বিদায় হন</span>
+                ভাই তেল নিয়ে <span className="text-blue-600">তারাতারি বিদায় হন</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto md:mx-0">
                 আমেরিকা যদি বাংলাদেশে তেলের খবর পায় তাহলে গণতন্ত্র প্রতিষ্ঠা করে দিবে।
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-4">
-                <button 
+                <button
                   onClick={scrollToMap}
                   className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
                 >
                   <MapPin size={20} />
                   ম্যাপ দেখুন
                 </button>
-                <button 
+                <button
                   onClick={scrollToMap}
                   className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 rounded-full font-semibold shadow-sm transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
                 >
@@ -109,11 +131,10 @@ function App() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedDivision('সব')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                selectedDivision === 'সব'
-                  ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-2'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-              }`}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedDivision === 'সব'
+                ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-2'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                }`}
             >
               সব
             </button>
@@ -121,11 +142,10 @@ function App() {
               <button
                 key={div}
                 onClick={() => setSelectedDivision(div)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  selectedDivision === div
-                    ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-2'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedDivision === div
+                  ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-2'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                  }`}
               >
                 {div}
               </button>
@@ -136,7 +156,7 @@ function App() {
         {/* Map Section */}
         <section ref={mapSectionRef} className="relative z-0 scroll-mt-24">
           <FuelMap pumps={filteredPumps} selectedPump={selectedPump} />
-          
+
           {/* Map Legend */}
           <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-md border border-gray-100 z-[400] text-xs space-y-2 pointer-events-none">
             <div className="font-semibold text-gray-700 mb-1">তেলের অবস্থা</div>
@@ -161,7 +181,7 @@ function App() {
             <h2 className="text-xl font-bold text-gray-900">পাম্পের তালিকা</h2>
             <span className="text-sm text-gray-500 bg-gray-200 px-3 py-1 rounded-full">{filteredPumps.length} টি পাম্প</span>
           </div>
-          
+
           {filteredPumps.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-2xl border border-gray-200 border-dashed">
               <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-3" />
@@ -180,15 +200,14 @@ function App() {
                     <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1" title={pump.name}>
                       {pump.name}
                     </h3>
-                    <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium ${
-                      pump.fuelStatus === 'তেল পাওয়া যাচ্ছে' ? 'bg-green-100 text-green-700' :
+                    <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-medium ${pump.fuelStatus === 'তেল পাওয়া যাচ্ছে' ? 'bg-green-100 text-green-700' :
                       pump.fuelStatus === 'সীমিত তেল' ? 'bg-orange-100 text-orange-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
+                        'bg-red-100 text-red-700'
+                      }`}>
                       {pump.fuelStatus}
                     </span>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
                       <MapPin size={16} className="text-gray-400" />
@@ -200,11 +219,10 @@ function App() {
                     </div>
                     <div className="flex items-center gap-2 pt-2 border-t border-gray-50">
                       <span className="text-gray-500">লাইন:</span>
-                      <span className={`font-medium ${
-                        pump.queueStatus === 'খুব লম্বা লাইন' ? 'text-red-600' :
+                      <span className={`font-medium ${pump.queueStatus === 'খুব লম্বা লাইন' ? 'text-red-600' :
                         pump.queueStatus === 'মাঝারি লাইন' ? 'text-orange-600' :
-                        'text-green-600'
-                      }`}>
+                          'text-green-600'
+                        }`}>
                         {pump.queueStatus}
                       </span>
                     </div>
@@ -235,8 +253,8 @@ function App() {
           তেল লাগবে একটি মজার এবং পরীক্ষামূলক ওয়েব প্রজেক্ট। এটি বাস্তব জ্বালানি তথ্য প্রদানের জন্য তৈরি করা হয়নি। এখানে প্রদর্শিত পাম্প, জ্বালানি অবস্থা বা লাইনের তথ্য বাস্তব নাও হতে পারে। এটি শুধুমাত্র ডিজাইন, প্রযুক্তি এবং সৃজনশীল ধারণা প্রদর্শনের উদ্দেশ্যে তৈরি।
         </p>
         <div className="pt-8">
-          <button 
-            onClick={() => setCurrentPage('home')}
+          <button
+            onClick={() => handleNavigation('home', '/')}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-full font-medium transition-colors"
           >
             হোমপেজে ফিরে যান
@@ -252,35 +270,30 @@ function App() {
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div 
-            className="flex items-center gap-2 cursor-pointer" 
-            onClick={() => setCurrentPage('home')}
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => handleNavigation('home', '/')}
           >
             <Fuel className="text-blue-600" size={32} />
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">তেল লাগবে</h1>
           </div>
-          
+
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex items-center gap-6">
-              <button 
-                onClick={() => setCurrentPage('home')}
+              <button
+                onClick={() => handleNavigation('home', '/')}
                 className={`text-sm font-medium transition-colors ${currentPage === 'home' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
               >
                 হোম
               </button>
-              <button 
-                onClick={() => setCurrentPage('about')}
-                className={`text-sm font-medium transition-colors ${currentPage === 'about' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+              <button
+                onClick={() => handleNavigation('teler-khobor', '/teler-khobor')}
+                className={`text-sm font-bold flex items-center gap-1 transition-colors px-3 py-1.5 rounded-full ${currentPage === 'teler-khobor' ? 'bg-orange-100 text-orange-600 shadow-sm' : 'text-orange-500 bg-orange-50 hover:bg-orange-100'}`}
               >
-                আমাদের সম্পর্কে
+                <ImageIcon size={14} />
+                তেলের খবর
               </button>
-              <button 
-                onClick={() => setCurrentPage('live')}
-                className={`text-sm font-medium transition-colors ${currentPage === 'live' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                লাইভ আপডেট
-              </button>
-              <a 
+              <a
                 href="https://www.facebook.com/Sayem1271/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -289,7 +302,7 @@ function App() {
                 তেলের আপডেট <ExternalLink size={14} />
               </a>
             </nav>
-            
+
             {currentPage === 'home' && (
               <div className="hidden md:flex items-center gap-4">
                 <div className="relative">
@@ -307,7 +320,7 @@ function App() {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <button 
+              <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
               >
@@ -321,34 +334,20 @@ function App() {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white">
             <div className="px-4 py-4 flex flex-col gap-4">
-              <button 
-                onClick={() => {
-                  setCurrentPage('home');
-                  setIsMobileMenuOpen(false);
-                }}
+              <button
+                onClick={() => handleNavigation('home', '/')}
                 className={`text-left text-base font-medium transition-colors ${currentPage === 'home' ? 'text-blue-600' : 'text-gray-600'}`}
               >
                 হোম
               </button>
-              <button 
-                onClick={() => {
-                  setCurrentPage('about');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`text-left text-base font-medium transition-colors ${currentPage === 'about' ? 'text-blue-600' : 'text-gray-600'}`}
+              <button
+                onClick={() => handleNavigation('teler-khobor', '/teler-khobor')}
+                className={`text-left text-base font-bold flex items-center gap-2 transition-colors ${currentPage === 'teler-khobor' ? 'text-orange-600' : 'text-orange-500'}`}
               >
-                আমাদের সম্পর্কে
+                <ImageIcon size={16} />
+                তেলের খবর
               </button>
-              <button 
-                onClick={() => {
-                  setCurrentPage('live');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`text-left text-base font-medium transition-colors ${currentPage === 'live' ? 'text-blue-600' : 'text-gray-600'}`}
-              >
-                লাইভ আপডেট
-              </button>
-              <a 
+              <a
                 href="https://www.facebook.com/Sayem1271/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -357,7 +356,7 @@ function App() {
               >
                 তেলের আপডেট <ExternalLink size={16} />
               </a>
-              
+
               {currentPage === 'home' && (
                 <div className="relative mt-2">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -376,7 +375,10 @@ function App() {
       </header>
 
       <div className="flex-1">
-        {currentPage === 'home' ? renderHomePage() : currentPage === 'about' ? renderAboutPage() : <LiveUpdate />}
+        {currentPage === 'home' ? renderHomePage() :
+          currentPage === 'about' ? renderAboutPage() :
+            currentPage === 'teler-khobor' ? <TelerKhobor /> :
+              <LiveUpdate />}
       </div>
 
       {/* Footer Disclaimer */}
@@ -389,12 +391,10 @@ function App() {
           <p className="text-sm max-w-2xl mx-auto leading-relaxed">
             "তেল লাগবে" একটি পরীক্ষামূলক এবং মজার প্রযুক্তি প্রজেক্ট। এখানে প্রদর্শিত তথ্য বাস্তব নাও হতে পারে। এটি শুধুমাত্র ডেমো উদ্দেশ্যে তৈরি।
           </p>
-          <div className="flex justify-center gap-4 pt-2">
-            <button onClick={() => setCurrentPage('home')} className="text-xs hover:text-white transition-colors">হোম</button>
+          <div className="flex flex-wrap justify-center gap-4 pt-2">
+            <button onClick={() => handleNavigation('home', '/')} className="text-xs hover:text-white transition-colors">হোম</button>
             <span className="text-gray-600">•</span>
-            <button onClick={() => setCurrentPage('about')} className="text-xs hover:text-white transition-colors">আমাদের সম্পর্কে</button>
-            <span className="text-gray-600">•</span>
-            <button onClick={() => setCurrentPage('live')} className="text-xs hover:text-white transition-colors">লাইভ আপডেট</button>
+            <button onClick={() => handleNavigation('teler-khobor', '/teler-khobor')} className="text-xs text-orange-400 hover:text-orange-300 transition-colors font-semibold">তেলের খবর</button>
           </div>
           <p className="text-xs text-gray-500 pt-2">
             &copy; {new Date().getFullYear()} তেল লাগবে ডেমো। সর্বস্বত্ব সংরক্ষিত।
