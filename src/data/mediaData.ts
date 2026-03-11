@@ -13,10 +13,9 @@ const videoModules = import.meta.glob('../assets/videos/*.{mp4,webm}', { eager: 
 export const imagesData: MediaItem[] = Object.entries(imageModules).map(([path, module]: [string, any], index) => {
   // Use sequential mapping, fallback to default title if index > titles.length
   const fallbackCaption = "তেল দিমুনা।";
-  const caption = index < memeTitles.length ? memeTitles[index] : fallbackCaption;
-
+  const caption = index < videoTitles.length ? videoTitles[index] : fallbackCaption;
   return {
-    id: `meme_img_${index + 1}`,
+    id: `viral_vid_${index + 1}`,
     url: module.default,
     caption: caption
   };
