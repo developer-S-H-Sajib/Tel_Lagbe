@@ -6,29 +6,21 @@ export interface MediaItem {
   caption: string;
 }
 
-// Dynamically import all images
-const imageModules = import.meta.glob('../assets/images/*.{jpg,png,jpeg,gif}', { eager: true });
-const videoModules = import.meta.glob('../assets/videos/*.{mp4,webm}', { eager: true });
+// Image and video data generation
+export const imagesData: MediaItem[] = Array.from({ length: 17 }, (_, index) => ({
+  id: `meme_${index + 1}`,
+  url: `/images/img${index + 1}.jpg`,
+  caption: memeTitles[index] || ""
+}));
 
-export const imagesData: MediaItem[] = Object.entries(imageModules).map(([path, module]: [string, any], index) => {
-  // Use sequential mapping, fallback to default title if index > titles.length
-  const fallbackCaption = "তেল দিমুনা।";
-  const caption = index < videoTitles.length ? videoTitles[index] : fallbackCaption;
-  return {
-    id: `viral_vid_${index + 1}`,
-    url: module.default,
-    caption: caption
-  };
-});
-
-export const videosData: MediaItem[] = Object.entries(videoModules).map(([path, module]: [string, any], index) => {
+export const videosData: MediaItem[] = Array.from({ length: 12 }).map((_, index) => {
   // Use sequential mapping, fallback to default title if index > titles.length
   const fallbackCaption = "তেলের লাইনের ";
   const caption = index < videoTitles.length ? videoTitles[index] : fallbackCaption;
 
   return {
     id: `viral_vid_${index + 1}`,
-    url: module.default,
+    url: `/videos/teler${index + 1}.mp4`,
     caption: caption
   };
 });

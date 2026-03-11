@@ -97,10 +97,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ item }) => {
         <video
           ref={videoRef}
           src={item.url}
-          className="w-full h-full object-contain"
-          muted={isMuted}
-          loop
+          muted
           playsInline
+          controls
+          preload="metadata"
+          className="w-full h-full object-contain"
+          style={{ width: "100%" }}
         />
 
         {/* Hover play/pause effect overlay */}

@@ -86,17 +86,21 @@ export const MemeCard: React.FC<MemeCardProps> = ({ item }) => {
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+        {/* Title Overlay at bottom of image */}
+        {item.caption && (
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <h3 className="text-white font-bold text-lg leading-snug line-clamp-2 drop-shadow-md">
+              {item.caption}
+            </h3>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center">
           <ZoomIn size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
         </div>
       </div>
 
       {/* Card Content Footer */}
       <div className="p-4 flex flex-col flex-1 gap-4">
-        <h3 className="font-bold text-gray-900 text-lg leading-snug line-clamp-2 min-h-[2.5rem]">
-          {item.caption}
-        </h3>
-
         <div className="mt-auto space-y-4">
           <ReactionSystem itemId={item.id} />
 
